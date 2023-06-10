@@ -4,29 +4,20 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 // repoCmd represents the repo command
 var repoCmd = &cobra.Command{
 	Use:   "repo",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "add, list, remove, and update module repositories",
+	Long: `This command consists of multiple subcommands to interact with module repositories.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("repo called")
-	},
+It can be used to add, remove, list, and update module repositories.`,
 }
 
 func init() {
 	rootCmd.AddCommand(repoCmd)
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

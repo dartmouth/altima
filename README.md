@@ -44,9 +44,10 @@ brew install altima
 altima init
 
 # Manage repos
-altima repo add https://dartgo.org/altima-rc
-altima repo remove https://dartgo.org/altima-rc
+altima repo add altima-rc https://dartgo.org/altima-rc
+altima repo remove altima-rc
 altima repo list
+altima repo update
 
 # Manage packages
 altima search

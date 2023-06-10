@@ -4,10 +4,13 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"altima/pkg/cli"
 	"os"
 
 	"github.com/spf13/cobra"
 )
+
+var settings *cli.EnvSettings
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -34,6 +37,13 @@ func Execute() {
 }
 
 func init() {
+	settings = cli.New()
+
+	err := os.MkdirAll(settings.ConfigDir, os.ModePerm)
+	check(err)
+	err = os.MkdirAll(settings.RepositoryCacheDir, os.ModePerm)
+	check(err)
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -43,4 +53,10 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
