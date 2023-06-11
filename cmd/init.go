@@ -11,7 +11,7 @@ import (
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
-	Use:   "init",
+	Use:   "init [-]",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -20,12 +20,33 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		if len(args) == 1 && args[0] == "-" {
+			runInit()
+		} else {
+			fmt.Printf(`
+# For ZSH, appending the following to ~/.zshrc
+
+  export ALTIMA_EXECUTABLE_DIR="%s"
+  command -v altima >/dev/null || export PATH="$ALTIMA_EXECUTABLE_DIR:$PATH"
+  eval "$(altima completion zsh)"
+  eval "$(altima init -)"
+
+# For BASH, appending the following to ~/.bash_profile
+
+  export ALTIMA_EXECUTABLE_DIR="%s"
+  command -v altima >/dev/null || export PATH="$ALTIMA_EXECUTABLE_DIR:$PATH"
+  eval "$(altima completion bash)"
+  eval "$(altima init -)"
+
+`, settings.ExecutableDir, settings.ExecutableDir)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
+
+	// # Restart your shell for the changes to take effect.
 
 	// Here you will define your flags and configuration settings.
 
@@ -36,4 +57,8 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func runInit() {
+	fmt.Println("# TODO: Load all modules")
 }
