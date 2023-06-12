@@ -43,7 +43,7 @@ func init() {
 	check(err)
 	err = os.MkdirAll(settings.CacheDir, os.ModePerm)
 	check(err)
-	err = os.MkdirAll(settings.ModuleDir, os.ModePerm)
+	err = os.MkdirAll(settings.ModulesDir, os.ModePerm)
 	check(err)
 	err = os.MkdirAll(settings.RepositoryCacheDir, os.ModePerm)
 	check(err)

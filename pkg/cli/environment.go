@@ -10,7 +10,7 @@ type EnvSettings struct {
 	ConfigDir          string
 	ConfigFilename     string
 	ExecutableDir      string
-	ModuleDir          string
+	ModulesDir         string
 	RepositoryCacheDir string
 }
 
@@ -27,7 +27,7 @@ func New() *EnvSettings {
 		ConfigDir:          envOr("ALTIMA_CONFIG_DIR", filepath.Join(homedirname, ".config", "altima")),
 		ConfigFilename:     envOr("ALTIMA_CONFIG_FILENAME", "altima.toml"),
 		ExecutableDir:      executableDir,
-		ModuleDir:          envOr("ALTIMA_MODULE_DIR", filepath.Join(homedirname, ".config", "altima", "module")),
+		ModulesDir:         envOr("ALTIMA_MODULE_DIR", filepath.Join(homedirname, ".config", "altima", "modules")),
 		RepositoryCacheDir: envOr("ALTIMA_REPOSITORY_CACHE_DIR", filepath.Join(homedirname, ".config", "altima", "cache", "repository")),
 	}
 	return env

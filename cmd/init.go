@@ -5,9 +5,19 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"golang.org/x/exp/slices"
 )
+
+type initOptions struct {
+}
+
+var moduleReservedWords = []string{"enabled", "name", "version", "repo_name"}
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
@@ -21,7 +31,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 && args[0] == "-" {
-			runInit()
+			o := &initOptions{}
+			o.run()
 		} else {
 			fmt.Printf(`
 # For ZSH, appending the following to ~/.zshrc
@@ -59,6 +70,28 @@ func init() {
 	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func runInit() {
-	fmt.Println("# TODO: Load all modules")
+func (o *initOptions) run() {
+	viper.SetConfigName(settings.ConfigFilename)
+	viper.SetConfigType("toml")
+	viper.AddConfigPath(settings.ConfigDir)
+	viper.ReadInConfig()
+
+	for m, _ := range viper.GetStringMap("modules") {
+		fmt.Printf("\n# Loading module: %s\n", m)
+		dat, err := os.ReadFile(filepath.Join(settings.ModulesDir, m, "init.sh"))
+		check(err)
+		rendered := string(dat)
+		// Replace all standard variables
+		rendered = strings.Replace(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m), 2)
+
+		// Replace all configured variables
+		for k, v := range viper.GetStringMap("modules." + m) {
+			if !slices.Contains(moduleReservedWords, k) {
+				rendered = strings.Replace(rendered, "${"+k+"}", fmt.Sprint(v), 2)
+			}
+		}
+
+		// Display rendered containt
+		fmt.Print(rendered)
+	}
 }
