@@ -77,21 +77,23 @@ func (o *initOptions) run() {
 	viper.ReadInConfig()
 
 	for m, _ := range viper.GetStringMap("modules") {
-		fmt.Printf("\n# Loading module: %s\n", m)
-		dat, err := os.ReadFile(filepath.Join(settings.ModulesDir, m, "init.sh"))
-		check(err)
-		rendered := string(dat)
-		// Replace all standard variables
-		rendered = strings.Replace(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m), 2)
+		// Check if module enabled
+		if viper.GetBool("modules." + m + ".enabled") {
+			fmt.Printf("\n# Loading module: %s\n", m)
+			dat, err := os.ReadFile(filepath.Join(settings.ModulesDir, m, "init.sh"))
+			check(err)
+			rendered := string(dat)
+			// Replace all standard variables
+			rendered = strings.Replace(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m), 2)
 
-		// Replace all configured variables
-		for k, v := range viper.GetStringMap("modules." + m) {
-			if !slices.Contains(moduleReservedWords, k) {
-				rendered = strings.Replace(rendered, "${"+k+"}", fmt.Sprint(v), 2)
+			// Replace all configured variables
+			for k, v := range viper.GetStringMap("modules." + m) {
+				if !slices.Contains(moduleReservedWords, k) {
+					rendered = strings.Replace(rendered, "${"+k+"}", fmt.Sprint(v), 2)
+				}
 			}
+			// Display rendered containt
+			fmt.Print(rendered)
 		}
-
-		// Display rendered containt
-		fmt.Print(rendered)
 	}
 }
