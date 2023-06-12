@@ -11,13 +11,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+type repoListOptions struct {
+}
+
 // repoListCmd represents the repoList command
 var repoListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list module repositories",
 	Long:  `list module repositories`,
 	Run: func(cmd *cobra.Command, args []string) {
-		repoList()
+		o := &repoListOptions{}
+		o.run()
 	},
 }
 
@@ -35,16 +39,16 @@ func init() {
 	// repoListCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func repoList() {
-	viper.SetConfigName(settings.RepositoryConfigFile)
+func (o *repoListOptions) run() {
+	viper.SetConfigName(settings.ConfigFilename)
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(settings.ConfigDir)
 	viper.ReadInConfig()
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"name", "url"})
 
-	for k, _ := range viper.AllSettings() {
-		table.Append([]string{k, viper.GetString(k + ".url")})
+	for k, _ := range viper.GetStringMap("repositories") {
+		table.Append([]string{k, viper.GetString("repositories." + k + ".url")})
 	}
 	table.Render() // Send output
 }

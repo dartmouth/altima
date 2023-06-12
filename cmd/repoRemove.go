@@ -25,7 +25,7 @@ var repoRemoveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		o := &repoRemoveOptions{}
 		o.name = args[0]
-		o.repoRemove()
+		o.run()
 	},
 }
 
@@ -43,30 +43,21 @@ func init() {
 	// repoRemoveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func (o *repoRemoveOptions) repoRemove() {
+func (o *repoRemoveOptions) run() {
 	// TODO: Purge cache for the repo being removed
 
 	// Load current repositories
-	viper.SetConfigName(settings.RepositoryConfigFile)
+	viper.SetConfigName(settings.ConfigFilename)
 	viper.SetConfigType("toml")
 	viper.AddConfigPath(settings.ConfigDir)
 	viper.ReadInConfig()
 
-	// Create a new instance of viper
-	viper_new := viper.New()
-	viper_new.SetConfigName(settings.RepositoryConfigFile)
-	viper_new.SetConfigType("toml")
-	viper_new.AddConfigPath(settings.ConfigDir)
-
 	// Remove repository
-	configMap := viper.AllSettings()
-	delete(configMap, o.name)
+	repositories := viper.GetStringMap("repositories")
+	delete(repositories, o.name)
+	viper.Set("repositories", repositories)
 
-	// Add all remaining repos to viper_new
-	for k, v := range configMap {
-		viper_new.Set(k, v)
-	}
-
-	viper_new.WriteConfigAs(filepath.Join(settings.ConfigDir, settings.RepositoryConfigFile))
+	// Write file
+	viper.WriteConfigAs(filepath.Join(settings.ConfigDir, settings.ConfigFilename))
 	fmt.Println("Removed repository `" + o.name + "`")
 }
