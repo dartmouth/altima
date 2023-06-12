@@ -6,6 +6,7 @@ package cmd
 import (
 	"altima/pkg/cli"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -47,6 +48,11 @@ func init() {
 	check(err)
 	err = os.MkdirAll(settings.RepositoryCacheDir, os.ModePerm)
 	check(err)
+
+	if _, err := os.Stat(filepath.Join(settings.ConfigDir, settings.ConfigFilename)); os.IsNotExist(err) {
+		_, err := os.Create(filepath.Join(settings.ConfigDir, settings.ConfigFilename))
+		check(err)
+	}
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
