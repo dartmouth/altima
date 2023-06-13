@@ -4,9 +4,8 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"altima/pkg/repo"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -60,12 +59,7 @@ func (o *repoAddOptions) run() {
 	}
 
 	// Download and save repo index
-	res, err := http.Get(o.url + "/index.yaml")
-	check(err)
-	content, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	check(err)
-	err = os.WriteFile(filepath.Join(settings.RepositoryCacheDir, o.name+".yaml"), content, 0644)
+	err = repo.DownloadIndexFile(o.name, o.url, settings.RepositoryCacheDir)
 	check(err)
 
 	// Write repo to config
@@ -76,5 +70,4 @@ func (o *repoAddOptions) run() {
 	viper.Set("repositories."+o.name, map[string]string{"url": o.url})
 	viper.WriteConfigAs(filepath.Join(settings.ConfigDir, settings.ConfigFilename))
 	fmt.Println("Added repository `" + o.name + "` from `" + o.url + "`")
-
 }

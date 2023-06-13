@@ -1,5 +1,37 @@
 package repo
 
+import (
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
+
+	"github.com/pkg/errors"
+)
+
+func DownloadIndexFile(name string, url string, cacheDir string) error {
+	res, err := http.Get(url + "/index.yaml")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != 200 {
+		return errors.Errorf("ERROR: Index not found")
+	}
+
+	content, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(filepath.Join(cacheDir, name+".yaml"), content, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DownloadIndexFile fetches the index from a repository.
 // func (r *ChartRepository) DownloadIndexFile() error {
 

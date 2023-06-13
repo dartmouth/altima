@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"altima/pkg/cli"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -67,6 +68,7 @@ func init() {
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		fmt.Println(e)
+		os.Exit(1)
 	}
 }
