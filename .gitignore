@@ -17,3 +17,4 @@
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Go
 altima
 altima_key.pem
+altima_credential.store
