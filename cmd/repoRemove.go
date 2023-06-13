@@ -20,8 +20,8 @@ type repoRemoveOptions struct {
 // repoRemoveCmd represents the repoRemove command
 var repoRemoveCmd = &cobra.Command{
 	Use:   "remove NAME",
-	Short: "remove one or more module repositories",
-	Long:  `remove one or more module repositories`,
+	Short: "Remove a module repositories",
+	Long:  `Remove a module repositories`,
 	Args:  cobra.ExactArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {

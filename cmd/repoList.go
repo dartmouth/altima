@@ -16,8 +16,8 @@ type repoListOptions struct{}
 // repoListCmd represents the repoList command
 var repoListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list module repositories",
-	Long:  `list module repositories`,
+	Short: "List module repositories",
+	Long:  `List module repositories`,
 	Run: func(cmd *cobra.Command, args []string) {
 		o := &repoListOptions{}
 		o.run()

@@ -22,13 +22,10 @@ var moduleReservedWords = []string{"enabled", "name", "version", "repo_name"}
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init [-]",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Initialize altima into the environment",
+	Long: `This command generates the commands to activate altima in your shell
+as well as generating the module shell components when '-' is provided.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 && args[0] == "-" {
 			o := &initOptions{}

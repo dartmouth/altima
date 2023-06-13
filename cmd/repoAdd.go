@@ -23,8 +23,8 @@ type repoAddOptions struct {
 // repoAddCmd represents the repoAdd command
 var repoAddCmd = &cobra.Command{
 	Use:   "add NAME URL",
-	Short: "add a module repository",
-	Long:  `add a module repository`,
+	Short: "Add a module repository",
+	Long:  `Add a module repository`,
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		o := &repoAddOptions{}

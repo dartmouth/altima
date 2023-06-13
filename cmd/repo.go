@@ -10,10 +10,10 @@ import (
 // repoCmd represents the repo command
 var repoCmd = &cobra.Command{
 	Use:   "repo",
-	Short: "add, list, remove, and update module repositories",
+	Short: "Add, List, and Remove module repositories",
 	Long: `This command consists of multiple subcommands to interact with module repositories.
 
-It can be used to add, remove, list, and update module repositories.`,
+It can be used to add, remove, and list module repositories.`,
 }
 
 func init() {
