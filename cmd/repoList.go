@@ -11,8 +11,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type repoListOptions struct {
-}
+type repoListOptions struct{}
 
 // repoListCmd represents the repoList command
 var repoListCmd = &cobra.Command{
