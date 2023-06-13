@@ -5,7 +5,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,7 +19,7 @@ type repoRemoveOptions struct {
 
 // repoRemoveCmd represents the repoRemove command
 var repoRemoveCmd = &cobra.Command{
-	Use:   "remove [NAME]",
+	Use:   "remove NAME",
 	Short: "remove one or more module repositories",
 	Long:  `remove one or more module repositories`,
 	Args:  cobra.ExactArgs(1),
@@ -44,7 +46,13 @@ func init() {
 }
 
 func (o *repoRemoveOptions) run() {
-	// TODO: Purge cache for the repo being removed
+	// Verify input
+	matched, err := regexp.MatchString("^[^-][a-zA-Z-]+$", o.name)
+	check(err)
+	if !matched {
+		fmt.Println("ERROR: Repo NAME must only contain letters, numbers, and dashes (can't start with dash)")
+		os.Exit(1)
+	}
 
 	// Load current repositories
 	viper.SetConfigName(settings.ConfigFilename)
@@ -52,12 +60,15 @@ func (o *repoRemoveOptions) run() {
 	viper.AddConfigPath(settings.ConfigDir)
 	viper.ReadInConfig()
 
+	// Delete repository index cache if it exists
+	os.Remove(filepath.Join(settings.RepositoryCacheDir, o.name+".yaml"))
+
 	// Remove repository
 	repositories := viper.GetStringMap("repositories")
 	delete(repositories, o.name)
 	viper.Set("repositories", repositories)
 
-	// Write file
+	// Write updated config
 	viper.WriteConfigAs(filepath.Join(settings.ConfigDir, settings.ConfigFilename))
 	fmt.Println("Removed repository `" + o.name + "`")
 }
