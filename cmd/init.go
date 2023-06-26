@@ -86,7 +86,7 @@ func (o *initOptions) run() {
 			// Replace all configured variables
 			for k, v := range viper.GetStringMap("modules." + m) {
 				if !slices.Contains(moduleReservedWords, k) {
-					rendered = strings.Replace(rendered, "${"+k+"}", fmt.Sprint(v), 2)
+					rendered = strings.ReplaceAll(rendered, "${"+k+"}", fmt.Sprint(v))
 				}
 			}
 			// Display rendered containt
