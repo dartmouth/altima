@@ -1,10 +1,10 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"altima/pkg/config"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -12,16 +12,18 @@ import (
 
 // enableCmd represents the enable command
 var enableCmd = &cobra.Command{
-	Use:   "enable",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "enable <module_name1> <module_name2> ...",
+	Short: "Enables a module",
+	Long:  "This command enables a module, so that it will be initialized the next time `altima init` is called.",
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("enable called")
+
+		for _, module := range args {
+			err := config.Enable(module)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		}
 	},
 }
 

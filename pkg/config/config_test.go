@@ -40,7 +40,7 @@ func TestDeduceType(t *testing.T) {
 
 func TestReadConfig(t *testing.T) {
 
-	cfg := ReadConfig("test_config.toml")
+	cfg := readConfig("test_config.toml")
 
 	// Test basic key/value pair
 	if cfg["key"] != "value" {
@@ -63,15 +63,23 @@ func TestReadConfig(t *testing.T) {
 }
 
 func TestWriteConfig(t *testing.T) {
-	err := WriteConfig("test_config_out.toml", test_cfg)
+	err := writeConfig("test_config_out.toml", test_cfg)
 	if err != nil {
 		t.Errorf("Could not write config file!")
 	}
 }
 
 func TestUpdateConfig(t *testing.T) {
-	err := UpdateConfig("test_config_out.toml", "table.subtable.inner_name", "new_name")
+	err := updateConfig("test_config_out.toml", "table.subtable.inner_name", "new_name")
 	if err != nil {
 		t.Errorf("Could not update config file!")
+	}
+}
+
+func TestEnable(t *testing.T) {
+	err := enable("test_config.toml", "mycow")
+
+	if err != nil {
+		t.Errorf("Could not enable %q!", "mycow")
 	}
 }

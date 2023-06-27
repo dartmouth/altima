@@ -9,8 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var configFilePath = "altima.toml"
-
 // configureCmd represents the configure command
 var configureCmd = &cobra.Command{
 	Use:   "configure",
@@ -25,7 +23,7 @@ var configureCmd = &cobra.Command{
 		key := args[0]
 		val := config.DeduceType(args[1])
 
-		err := config.UpdateConfig(configFilePath, key, val)
+		err := config.UpdateConfig(key, val)
 		if err != nil {
 			panic(err)
 		}

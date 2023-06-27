@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,6 +11,8 @@ import (
 )
 
 type Config = map[string]any
+
+var Filepath = "altima.toml"
 
 func DeduceType(v string) any {
 	// The TOML syntax with respect to types is identical to JSON
@@ -47,8 +50,12 @@ func DeduceType(v string) any {
 	return v
 }
 
-func ReadConfig(filename string) Config {
-	doc, err := os.ReadFile(filename)
+func ReadConfig() Config {
+	return readConfig(Filepath)
+}
+
+func readConfig(filepath string) Config {
+	doc, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}
@@ -61,14 +68,18 @@ func ReadConfig(filename string) Config {
 	return cfg
 }
 
-func WriteConfig(filename string, cfg Config) error {
+func WriteConfig(cfg Config) error {
 
+	return writeConfig(Filepath, cfg)
+}
+
+func writeConfig(filepath string, cfg Config) error {
 	toml_string, err := toml.Marshal(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile(filename, toml_string, 0666)
+	err = os.WriteFile(filepath, toml_string, 0666)
 
 	if err != nil {
 		panic(err)
@@ -77,8 +88,12 @@ func WriteConfig(filename string, cfg Config) error {
 	return err
 }
 
-func UpdateConfig(filename string, key string, val any) error {
-	cfg := ReadConfig(filename)
+func UpdateConfig(key string, val any) error {
+	return updateConfig(Filepath, key, val)
+}
+
+func updateConfig(filepath string, key string, val any) error {
+	cfg := readConfig(filepath)
 
 	// The key may be a nested key (dot notation)
 	parts := strings.Split(key, ".")
@@ -102,7 +117,20 @@ func UpdateConfig(filename string, key string, val any) error {
 	// If it exists, set it to the requested value
 	(*current_map)[parts[len(parts)-1]] = val
 
-	WriteConfig(filename, cfg)
+	writeConfig(filepath, cfg)
 
 	return nil
+}
+
+func Enable(module string) error {
+	return enable(Filepath, module)
+}
+
+func enable(filepath string, module string) error {
+	err := updateConfig(filepath, "modules."+module+".enabled", true)
+
+	if err != nil {
+		err = fmt.Errorf("Module %q not found!", module)
+	}
+	return err
 }
