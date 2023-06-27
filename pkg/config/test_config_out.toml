@@ -1,9 +1,0 @@
-key = 'value'
-number = 4
-
-[table]
-enabled = false
-name = 'test'
-
-[table.subtable]
-inner_name = 'new_name'

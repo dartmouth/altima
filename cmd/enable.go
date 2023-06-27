@@ -4,10 +4,10 @@ Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 package cmd
 
 import (
-	"altima/pkg/config"
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // enableCmd represents the enable command
@@ -18,12 +18,25 @@ var enableCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
+		viper.SetConfigName(settings.ConfigFilename)
+		viper.SetConfigType("toml")
+		viper.AddConfigPath(settings.ConfigDir)
+		viper.ReadInConfig()
+
+		modules := viper.GetStringMap("modules")
+
 		for _, module := range args {
-			err := config.Enable(module)
-			if err != nil {
-				fmt.Println(err.Error())
+
+			_, exists := modules[module]
+
+			if !exists {
+				fmt.Println(fmt.Errorf("Could not find module %q!", module))
+			} else {
+				viper.Set("modules."+module+".enabled", true)
 			}
 		}
+
+		viper.WriteConfig()
 	},
 }
 

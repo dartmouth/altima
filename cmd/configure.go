@@ -4,9 +4,12 @@ Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 package cmd
 
 import (
-	"altima/pkg/config"
+	"fmt"
+
+	"altima/pkg/util"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // configureCmd represents the configure command
@@ -20,17 +23,27 @@ var configureCmd = &cobra.Command{
 	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		key := args[0]
-		val := config.DeduceType(args[1])
+		viper.SetConfigName(settings.ConfigFilename)
+		viper.SetConfigType("toml")
+		viper.AddConfigPath(settings.ConfigDir)
+		viper.ReadInConfig()
 
-		err := config.UpdateConfig(key, val)
-		if err != nil {
-			panic(err)
+		key := args[0]
+
+		if !viper.InConfig(key) {
+			fmt.Println(fmt.Errorf("Could not find the key %q in the config file %q!", key, settings.ConfigFilename))
+			return
 		}
+
+		val := util.DeduceType(args[1])
+
+		viper.Set(key, val)
+		viper.WriteConfig()
 	},
 }
 
 func init() {
+
 	rootCmd.AddCommand(configureCmd)
 
 	// Here you will define your flags and configuration settings.

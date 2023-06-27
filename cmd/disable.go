@@ -4,10 +4,10 @@ Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 package cmd
 
 import (
-	"altima/pkg/config"
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // disableCmd represents the disable command
@@ -17,12 +17,25 @@ var disableCmd = &cobra.Command{
 	Long:  "This command disables a module, so that it will not be initialized the next time `altima init` is called.",
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		viper.SetConfigName(settings.ConfigFilename)
+		viper.SetConfigType("toml")
+		viper.AddConfigPath(settings.ConfigDir)
+		viper.ReadInConfig()
+
+		modules := viper.GetStringMap("modules")
+
 		for _, module := range args {
-			err := config.Disable(module)
-			if err != nil {
-				fmt.Println(err.Error())
+
+			_, exists := modules[module]
+
+			if !exists {
+				fmt.Println(fmt.Errorf("Could not find module %q!", module))
+			} else {
+				viper.Set("modules."+module+".enabled", false)
 			}
 		}
+
+		viper.WriteConfig()
 	},
 }
 
