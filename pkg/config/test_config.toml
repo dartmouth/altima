@@ -1,0 +1,22 @@
+key = 'value'
+
+[modules]
+[modules.mycow]
+name = 'cow'
+version = 'v0.0.1'
+repo_name = 'crossett'
+enabled = true
+cow_type = 'Holstein'
+[modules.myhorse]
+name = 'horse'
+version = 'v0.0.2'
+repo_name = 'crossett'
+enabled = true
+
+
+[repositories]
+[repositories.crossett]
+url = 'https://raw.githubusercontent.com/crossett/altima-modules/main/modules/'
+
+[user]
+name = "Jack Doe"
