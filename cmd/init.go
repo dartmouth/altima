@@ -81,7 +81,9 @@ func (o *initOptions) run() {
 			check(err)
 			rendered := string(dat)
 			// Replace all standard variables
-			rendered = strings.Replace(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m), 2)
+			rendered = strings.ReplaceAll(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m))
+			rendered = strings.ReplaceAll(rendered, "${module_name}", m)
+			rendered = strings.ReplaceAll(rendered, "${altima_config_path}", filepath.Join(settings.ConfigDir, settings.ConfigFilename))
 
 			// Replace all configured variables
 			for k, v := range viper.GetStringMap("modules." + m) {
