@@ -18,3 +18,6 @@
 altima
 altima_key.pem
 altima_credential.store
+
+# VS Code configuration files
+.vscode/
