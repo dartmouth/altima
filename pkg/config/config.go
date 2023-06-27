@@ -1,3 +1,6 @@
+/*
+Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
+*/
 package config
 
 import (
@@ -128,6 +131,19 @@ func Enable(module string) error {
 
 func enable(filepath string, module string) error {
 	err := updateConfig(filepath, "modules."+module+".enabled", true)
+
+	if err != nil {
+		err = fmt.Errorf("Module %q not found!", module)
+	}
+	return err
+}
+
+func Disable(module string) error {
+	return disable(Filepath, module)
+}
+
+func disable(filepath string, module string) error {
+	err := updateConfig(filepath, "modules."+module+".enabled", false)
 
 	if err != nil {
 		err = fmt.Errorf("Module %q not found!", module)

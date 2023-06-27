@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 */
 package cmd
 

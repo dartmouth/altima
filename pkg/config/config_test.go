@@ -83,3 +83,11 @@ func TestEnable(t *testing.T) {
 		t.Errorf("Could not enable %q!", "mycow")
 	}
 }
+
+func TestDisable(t *testing.T) {
+	err := disable("test_config.toml", "mycow")
+
+	if err != nil {
+		t.Errorf("Could not disable %q!", "mycow")
+	}
+}
