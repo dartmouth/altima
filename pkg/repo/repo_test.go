@@ -32,3 +32,11 @@ func TestSearch(t *testing.T) {
 		t.Error("Returned a false positive result!")
 	}
 }
+
+func TestInstallModule(t *testing.T) {
+	settings := cli.New()
+	err := InstallModule("cow", "https://github.com/crossett/altima-modules/releases/download/v0.0.1/cow-v0.0.1.tgz", settings.ModulesDir)
+	if err != nil {
+		t.Error("Could not install module!")
+	}
+}

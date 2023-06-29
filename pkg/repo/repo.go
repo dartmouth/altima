@@ -4,6 +4,7 @@ import (
 	"altima/pkg/util"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
@@ -53,6 +54,27 @@ func Search(name string, version string, cacheDir string) (string, error) {
 	}
 
 	return "", fmt.Errorf("Could not find module %q in version %q in any index!", name, version)
+}
+
+func InstallModule(name string, url string, rootDir string) error {
+	archiveFile := filepath.Join(rootDir, path.Base(url))
+	moduleRootFolder := filepath.Join(rootDir, name)
+	err := util.DownloadFile(archiveFile, url)
+	if err != nil {
+		return err
+	}
+
+	err = util.UnpackFile(archiveFile, moduleRootFolder)
+	if err != nil {
+		return err
+	}
+
+	err = util.DeleteFile(archiveFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // DownloadIndexFile fetches the index from a repository.
