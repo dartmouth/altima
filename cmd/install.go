@@ -6,7 +6,7 @@ package cmd
 import (
 	"altima/pkg/repo"
 	"fmt"
-	"strings"
+	"regexp"
 
 	"github.com/spf13/cobra"
 )
@@ -15,7 +15,7 @@ import (
 var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Installs modules from the module index",
-	Long:  `Installs one or more modules from the module index. You can optionally supply a version number`,
+	Long:  `Installs one or more modules from the module index. You can optionally supply a version number and an alias (to avoid name collision).`,
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -41,11 +41,19 @@ var installCmd = &cobra.Command{
 			}
 
 			fmt.Printf("Found URL %q...\n", url)
-			fmt.Printf("Installing module %q...\n", module.Name)
-			err = repo.InstallModule(module.Name, url, settings.ModulesDir)
+
+			installName := module.Name
+			fmt.Printf("Installing module %q...\n", installName)
+
+			if module.Alias != "" {
+				installName = module.Alias
+				fmt.Printf("Using install name %q...\n", installName)
+			}
+
+			err = repo.InstallModule(installName, url, settings.ModulesDir)
 
 			if err != nil {
-				msg := fmt.Sprintf("Failed to install module %q", module.Name)
+				msg := fmt.Sprintf("Failed to install module %q", installName)
 				if module.Version != "" {
 					msg += fmt.Sprintf(" in version %q", module.Version)
 				}
@@ -53,7 +61,7 @@ var installCmd = &cobra.Command{
 				fmt.Println(fmt.Errorf(msg))
 				continue
 			}
-			fmt.Printf("Module %q installed successfully.\n", module.Name)
+			fmt.Printf("Module %q installed successfully.\n", installName)
 		}
 	},
 }
@@ -75,24 +83,55 @@ func init() {
 type Module struct {
 	Name    string
 	Version string
+	Alias   string
 }
 
 func getModules(args []string) []Module {
-	// Module names and versions are supplied on the command line like this:
-	// moduleA moduleB==v0.0.2 moduleC
+	// Module names, versions and aliases are supplied on the command line like this:
+	// moduleA moduleB==v0.0.2 moduleC>myAlias moduleD==v0.0.3>myOtherAlias
 	// This function turns the slice of arguments into a slice of Module objects.
 
 	modules := make([]Module, 0)
 	for _, arg := range args {
-		if !strings.Contains(arg, "==") {
-			modules = append(modules, Module{arg, ""})
-		} else {
-			parts := strings.Split(arg, "==")
-			name := parts[0]
-			version := parts[1]
-			modules = append(modules, Module{name, version})
-		}
+		modules = append(modules, Module{
+			getName(arg),
+			getVersion(arg),
+			getAlias(arg),
+		})
 	}
 
 	return modules
+}
+
+func getName(s string) string {
+	// The name of the module comes before the version or the alias
+	pattern := regexp.MustCompile("^(.*?)(?:==|>|$)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
+}
+
+func getVersion(s string) string {
+	// The version always follows `==` and may precede `>`
+	pattern := regexp.MustCompile("==(.*?)(?:>|$)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
+}
+
+func getAlias(s string) string {
+	// The alias always follows `>`
+	pattern := regexp.MustCompile(">(.*)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
 }
