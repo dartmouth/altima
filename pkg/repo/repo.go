@@ -20,7 +20,7 @@ func DownloadIndexFile(name string, url string, cacheDir string) error {
 }
 
 // Check the cached list of modules for the specified version and return the URL
-// If `version` is an empty string, the version listed first in the index is used
+// If `version` is an empty string, the version listed last in the index is used
 func Search(name string, version string, cacheDir string) (string, error) {
 	indexFiles, _ := filepath.Glob(cacheDir + "/*.yaml")
 
@@ -31,6 +31,7 @@ func Search(name string, version string, cacheDir string) (string, error) {
 			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
 		}
 
+		// Read index File
 		type Index struct {
 			ApiVersion string
 			Modules    map[string][]map[string]string
@@ -41,12 +42,18 @@ func Search(name string, version string, cacheDir string) (string, error) {
 			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
 		}
 
+		// Find URL for correct version of module
 		for listedName, versions := range index.Modules {
 			if listedName != name {
 				continue
 			}
+			// If the version was not explicitly specified, return the url of the last version
+			if version == "" {
+				return versions[len(versions)-1]["url"], nil
+			}
+			// Otherwise look for an exact match
 			for _, listedVersion := range versions {
-				if listedVersion["version"] == version || version == "" {
+				if listedVersion["version"] == version {
 					return listedVersion["url"], nil
 				}
 			}
