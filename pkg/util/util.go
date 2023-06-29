@@ -5,6 +5,11 @@ package util
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"os"
+
+	"github.com/pkg/errors"
 )
 
 func DeduceType(v string) any {
@@ -41,4 +46,27 @@ func DeduceType(v string) any {
 
 	// It probably was a string all along
 	return v
+}
+
+func DownloadFile(filename string, url string) error {
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != 200 {
+		return errors.Errorf("ERROR: File not found")
+	}
+
+	content, err := ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(filename, content, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

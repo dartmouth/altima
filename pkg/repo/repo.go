@@ -1,33 +1,16 @@
 package repo
 
 import (
+	"altima/pkg/util"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/pkg/errors"
 )
 
 func DownloadIndexFile(name string, url string, cacheDir string) error {
-	res, err := http.Get(url + "/index.yaml")
-	if err != nil {
-		return err
-	}
-	if res.StatusCode != 200 {
-		return errors.Errorf("ERROR: Index not found")
-	}
-
-	content, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile(filepath.Join(cacheDir, name+".yaml"), content, 0644)
+	err := util.DownloadFile(filepath.Join(cacheDir, name+".yaml"), url+"/index.yaml")
 	if err != nil {
 		return err
 	}
