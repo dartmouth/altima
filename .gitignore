@@ -21,3 +21,6 @@ altima_credential.store
 
 # VS Code configuration files
 .vscode/
+
+# Mac-specific metadata file
+.DS_Store
