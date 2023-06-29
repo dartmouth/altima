@@ -38,14 +38,13 @@ func DownloadIndexFile(name string, url string, cacheDir string) error {
 // Check the cached list of modules for the specified version and return the URL
 func Search(name string, version string, cacheDir string) (string, error) {
 
-	url := ""
-
 	indexFiles, _ := filepath.Glob(cacheDir + "/*.yaml")
 
 	for _, indexFile := range indexFiles {
+
 		data, err := os.ReadFile(indexFile)
 		if err != nil {
-			return url, err
+			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
 		}
 
 		type Index struct {
@@ -53,7 +52,10 @@ func Search(name string, version string, cacheDir string) (string, error) {
 			Modules    map[string][]map[string]string
 		}
 		var index Index
-		yaml.Unmarshal([]byte(data), &index)
+		err = yaml.Unmarshal([]byte(data), &index)
+		if err != nil {
+			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
+		}
 
 		for listedName, versions := range index.Modules {
 			if listedName != name {
@@ -67,12 +69,7 @@ func Search(name string, version string, cacheDir string) (string, error) {
 		}
 	}
 
-	if url == "" {
-		err := fmt.Errorf("Could not find module %q of version %q in cached repo index!", name, version)
-		return url, err
-	}
-
-	return url, nil
+	return "", fmt.Errorf("Could not find module %q in version %q in any index!", name, version)
 }
 
 // DownloadIndexFile fetches the index from a repository.
