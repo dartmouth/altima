@@ -1,10 +1,13 @@
 package repo
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/yaml.v3"
 
 	"github.com/pkg/errors"
 )
@@ -30,6 +33,46 @@ func DownloadIndexFile(name string, url string, cacheDir string) error {
 	}
 
 	return nil
+}
+
+// Check the cached list of modules for the specified version and return the URL
+func Search(name string, version string, cacheDir string) (string, error) {
+
+	url := ""
+
+	indexFiles, _ := filepath.Glob(cacheDir + "/*.yaml")
+
+	for _, indexFile := range indexFiles {
+		data, err := os.ReadFile(indexFile)
+		if err != nil {
+			return url, err
+		}
+
+		type Index struct {
+			ApiVersion string
+			Modules    map[string][]map[string]string
+		}
+		var index Index
+		yaml.Unmarshal([]byte(data), &index)
+
+		for listedName, versions := range index.Modules {
+			if listedName != name {
+				continue
+			}
+			for _, listedVersion := range versions {
+				if listedVersion["version"] == version {
+					return listedVersion["url"], nil
+				}
+			}
+		}
+	}
+
+	if url == "" {
+		err := fmt.Errorf("Could not find module %q of version %q in cached repo index!", name, version)
+		return url, err
+	}
+
+	return url, nil
 }
 
 // DownloadIndexFile fetches the index from a repository.
