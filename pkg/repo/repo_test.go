@@ -20,6 +20,12 @@ func TestSearch(t *testing.T) {
 		t.Error("Failed to find module in index!")
 	}
 
+	url, err = Search("horse", "", settings.RepositoryCacheDir)
+
+	if url == "" || err != nil {
+		t.Error("Failed to find module in index!")
+	}
+
 	url, err = Search("horse", "v0.x.y", settings.RepositoryCacheDir)
 
 	if url != "" || err == nil {

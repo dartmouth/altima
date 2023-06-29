@@ -19,8 +19,8 @@ func DownloadIndexFile(name string, url string, cacheDir string) error {
 }
 
 // Check the cached list of modules for the specified version and return the URL
+// If `version` is an empty string, the version listed first in the index is used
 func Search(name string, version string, cacheDir string) (string, error) {
-
 	indexFiles, _ := filepath.Glob(cacheDir + "/*.yaml")
 
 	for _, indexFile := range indexFiles {
@@ -45,7 +45,7 @@ func Search(name string, version string, cacheDir string) (string, error) {
 				continue
 			}
 			for _, listedVersion := range versions {
-				if listedVersion["version"] == version {
+				if listedVersion["version"] == version || version == "" {
 					return listedVersion["url"], nil
 				}
 			}
