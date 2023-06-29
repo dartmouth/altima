@@ -4,10 +4,15 @@ Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 package util
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 
 	"github.com/pkg/errors"
 )
@@ -69,4 +74,61 @@ func DownloadFile(filename string, url string) error {
 	}
 
 	return nil
+}
+
+func UnpackFile(filename string, targetRoot string) error {
+	dat, err := os.Open(filename)
+
+	defer dat.Close()
+
+	zr, err := gzip.NewReader(dat)
+	if err != nil {
+		return err
+	}
+
+	tr := tar.NewReader(zr)
+
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		target := filepath.Join(targetRoot, hdr.Name)
+
+		switch hdr.Typeflag {
+
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return err
+				}
+			}
+
+		case tar.TypeReg:
+			// Exclude Mac-specific indicator files
+			if path.Base(target)[0:2] == "._" {
+				continue
+			}
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(hdr.Mode))
+			if err != nil {
+				return err
+			}
+
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+
+			f.Close()
+		}
+	}
+
+	return nil
+}
+
+func DeleteFile(filename string) error {
+	return os.Remove(filename)
 }
