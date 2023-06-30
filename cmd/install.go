@@ -50,7 +50,7 @@ var installCmd = &cobra.Command{
 				fmt.Printf("Using install name %q...\n", installName)
 			}
 
-			err = repo.InstallModule(installName, module.Url, settings.ModulesDir)
+			err = repo.InstallModule(module, settings.ModulesDir)
 
 			if err != nil {
 				msg := fmt.Sprintf("Failed to install module %q", installName)

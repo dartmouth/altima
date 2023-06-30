@@ -80,10 +80,15 @@ func Search(module Module, cacheDir string) (Module, error) {
 	return module, fmt.Errorf("Could not find module %q in version %q in any index!", module.Name, module.Version)
 }
 
-func InstallModule(name string, url string, rootDir string) error {
-	archiveFile := filepath.Join(rootDir, path.Base(url))
-	moduleRootFolder := filepath.Join(rootDir, name)
-	err := util.DownloadFile(archiveFile, url)
+func InstallModule(module Module, rootDir string) error {
+	archiveFile := filepath.Join(rootDir, path.Base(module.Url))
+	installName := module.Name
+	if module.Alias != "" {
+		installName = module.Alias
+	}
+
+	moduleRootFolder := filepath.Join(rootDir, installName)
+	err := util.DownloadFile(archiveFile, module.Url)
 	if err != nil {
 		return err
 	}
