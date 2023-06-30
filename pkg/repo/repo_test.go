@@ -8,27 +8,27 @@ import (
 func TestSearch(t *testing.T) {
 	settings := cli.New()
 
-	url, err := Search("cow", "v0.0.1", settings.RepositoryCacheDir)
+	module, err := Search(Module{Name: "cow", Version: "v0.0.1"}, settings.RepositoryCacheDir)
 
-	if url == "" || err != nil {
+	if module.Url == "" || err != nil {
 		t.Error("Failed to find module in index!")
 	}
 
-	url, err = Search("horse", "v0.0.2", settings.RepositoryCacheDir)
+	module, err = Search(Module{Name: "horse", Version: "v0.0.2"}, settings.RepositoryCacheDir)
 
-	if url == "" || err != nil {
+	if module.Url == "" || err != nil {
 		t.Error("Failed to find module in index!")
 	}
 
-	url, err = Search("horse", "", settings.RepositoryCacheDir)
+	module, err = Search(Module{Name: "horse"}, settings.RepositoryCacheDir)
 
-	if url == "" || err != nil {
+	if module.Url == "" || err != nil {
 		t.Error("Failed to find module in index!")
 	}
 
-	url, err = Search("horse", "v0.x.y", settings.RepositoryCacheDir)
+	module, err = Search(Module{Name: "horse", Version: "v0.x.y"}, settings.RepositoryCacheDir)
 
-	if url != "" || err == nil {
+	if module.Url != "" || err == nil {
 		t.Error("Returned a false positive result!")
 	}
 }

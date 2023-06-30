@@ -28,7 +28,7 @@ var installCmd = &cobra.Command{
 				fmt.Printf("Searching URL for module %q...\n", module.Name)
 			}
 
-			url, err := repo.Search(module.Name, module.Version, settings.RepositoryCacheDir)
+			module, err := repo.Search(module, settings.RepositoryCacheDir)
 
 			if err != nil {
 				msg := fmt.Sprintf("Failed to find module %q", module.Name)
@@ -40,7 +40,7 @@ var installCmd = &cobra.Command{
 				continue
 			}
 
-			fmt.Printf("Found URL %q...\n", url)
+			fmt.Printf("Found URL %q...\n", module.Url)
 
 			installName := module.Name
 			fmt.Printf("Installing module %q...\n", installName)
@@ -50,7 +50,7 @@ var installCmd = &cobra.Command{
 				fmt.Printf("Using install name %q...\n", installName)
 			}
 
-			err = repo.InstallModule(installName, url, settings.ModulesDir)
+			err = repo.InstallModule(installName, module.Url, settings.ModulesDir)
 
 			if err != nil {
 				msg := fmt.Sprintf("Failed to install module %q", installName)
@@ -80,23 +80,17 @@ func init() {
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-type Module struct {
-	Name    string
-	Version string
-	Alias   string
-}
-
-func getModules(args []string) []Module {
+func getModules(args []string) []repo.Module {
 	// Module names, versions and aliases are supplied on the command line like this:
 	// moduleA moduleB==v0.0.2 moduleC>myAlias moduleD==v0.0.3>myOtherAlias
 	// This function turns the slice of arguments into a slice of Module objects.
 
-	modules := make([]Module, 0)
+	modules := make([]repo.Module, 0)
 	for _, arg := range args {
-		modules = append(modules, Module{
-			getName(arg),
-			getVersion(arg),
-			getAlias(arg),
+		modules = append(modules, repo.Module{
+			Name:    getName(arg),
+			Version: getVersion(arg),
+			Alias:   getAlias(arg),
 		})
 	}
 

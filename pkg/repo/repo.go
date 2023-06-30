@@ -10,6 +10,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Module struct {
+	Name    string
+	Version string
+	Alias   string
+	Repo    string
+	Url     string
+}
+
 func DownloadIndexFile(name string, url string, cacheDir string) error {
 	err := util.DownloadFile(filepath.Join(cacheDir, name+".yaml"), url+"/index.yaml")
 	if err != nil {
@@ -19,9 +27,9 @@ func DownloadIndexFile(name string, url string, cacheDir string) error {
 	return nil
 }
 
-// Check the cached list of modules for the specified version and return the URL
+// Check the cached list of modules for the specified version and return the Module info
 // If `version` is an empty string, the version listed last in the index is used
-func Search(name string, version string, cacheDir string) (string, error) {
+func Search(module Module, cacheDir string) (Module, error) {
 	indexFiles, _ := filepath.Glob(cacheDir + "/*.yaml")
 
 	for _, indexFile := range indexFiles {
@@ -29,7 +37,10 @@ func Search(name string, version string, cacheDir string) (string, error) {
 		data, err := os.ReadFile(indexFile)
 		if err != nil {
 			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
+			continue
 		}
+
+		repoName := filepath.Base(indexFile)[:len(filepath.Base(indexFile))-5]
 
 		// Read index File
 		type Index struct {
@@ -40,27 +51,33 @@ func Search(name string, version string, cacheDir string) (string, error) {
 		err = yaml.Unmarshal([]byte(data), &index)
 		if err != nil {
 			fmt.Println(fmt.Errorf("Error reading index file %q: %q", indexFile, err))
+			continue
 		}
 
 		// Find URL for correct version of module
 		for listedName, versions := range index.Modules {
-			if listedName != name {
+			if listedName != module.Name {
 				continue
 			}
 			// If the version was not explicitly specified, return the url of the last version
-			if version == "" {
-				return versions[len(versions)-1]["url"], nil
+			if module.Version == "" {
+				module.Version = versions[len(versions)-1]["version"]
+				module.Url = versions[len(versions)-1]["url"]
+				module.Repo = repoName
+				return module, nil
 			}
 			// Otherwise look for an exact match
 			for _, listedVersion := range versions {
-				if listedVersion["version"] == version {
-					return listedVersion["url"], nil
+				if listedVersion["version"] == module.Version {
+					module.Url = listedVersion["url"]
+					module.Repo = repoName
+					return module, nil
 				}
 			}
 		}
 	}
 
-	return "", fmt.Errorf("Could not find module %q in version %q in any index!", name, version)
+	return module, fmt.Errorf("Could not find module %q in version %q in any index!", module.Name, module.Version)
 }
 
 func InstallModule(name string, url string, rootDir string) error {
