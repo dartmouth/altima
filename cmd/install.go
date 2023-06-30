@@ -6,9 +6,13 @@ package cmd
 import (
 	"altima/pkg/repo"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 
+	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // installCmd represents the install command
@@ -20,6 +24,13 @@ var installCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		modules := getModules(args)
+
+		viper.SetConfigName(settings.ConfigFilename)
+		viper.SetConfigType("toml")
+		viper.AddConfigPath(settings.ConfigDir)
+		viper.ReadInConfig()
+
+		modulesConfig := viper.GetStringMap("modules")
 
 		for _, module := range modules {
 			if module.Version != "" {
@@ -61,8 +72,31 @@ var installCmd = &cobra.Command{
 				fmt.Println(fmt.Errorf(msg))
 				continue
 			}
+
+			fmt.Println("Updating altima config...")
+
+			moduleConfigFile := filepath.Join(settings.ModulesDir, installName, "default_config.toml")
+
+			buf, err := os.ReadFile(moduleConfigFile)
+			if err != nil {
+				fmt.Println("failed to open default config file!")
+				continue
+			}
+
+			var newConfig map[string]any
+			toml.Unmarshal(buf, &newConfig)
+
+			newConfig["name"] = module.Name
+			newConfig["version"] = module.Version
+			newConfig["repo_name"] = module.Repo
+			newConfig["enabled"] = true
+
+			modulesConfig[installName] = newConfig
+
 			fmt.Printf("Module %q installed successfully.\n", installName)
 		}
+		viper.Set("modules", modulesConfig)
+		viper.WriteConfig()
 	},
 }
 
