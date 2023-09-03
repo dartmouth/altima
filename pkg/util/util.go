@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
-*/
 package util
 
 import (

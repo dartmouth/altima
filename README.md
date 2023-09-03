@@ -1,40 +1,16 @@
 # altima
 
-Goals
+## Goals
+
 - Performance
 - Tool for SysAdmins
 - Easy to install and configure
 - Consistent interface
 - Flexible module repos
 - Different arch releases
+- Modules built in anything, mainly Shell
 
-Location
-- GitLab
-- GitHub
-- https://github.com/elijahgagne/altima
-- https://github.com/dartmouth/altima
-
-Name
-- altima
-- altima.sh
-
-How to work
-- Git repo issues
-
-Core
-- Build in Go
-
-Modules
-- Build in anything, mainly Shell
-
-Roles
-- People writing Go for the core
-- People writing Shell for the modules
-- Documentation
-- Packaging and installation
-- Testers
-
-Examples
+## Example commands
 
 ```sh
 # Install altima itself
@@ -53,4 +29,10 @@ altima repo update
 altima search
 altima install cyberark
 altima list
+```
+
+## Build
+
+```sh
+go build
 ```
