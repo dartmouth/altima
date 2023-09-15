@@ -20,10 +20,10 @@ brew install altima
 altima init
 
 # Manage repos
-altima repo add altima-rc https://dartgo.org/altima-rc
-altima repo remove altima-rc
+altima repo add altima-core https://git.dartmouth.edu/research-itc-public/altima-core-modules/-/raw/main/
 altima repo list
-altima repo update
+altima update
+altima repo remove altima-core
 
 # Manage packages
 altima search
