@@ -4,9 +4,8 @@ Copyright © 2023 Simon Stone <simon.stone@dartmouth.edu>
 package cmd
 
 import (
-	"fmt"
-
 	"altima/pkg/util"
+	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
