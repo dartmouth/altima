@@ -1,8 +1,17 @@
 package util
 
 import (
+	"errors"
 	"testing"
 )
+
+func TestCheckError(t *testing.T){
+	defer func() { recover() }()
+	e := errors.New("A wild error appears!")
+	CheckError(e)
+
+	t.Errorf("Did not panic!")
+}
 
 func TestDeduceType(t *testing.T) {
 

@@ -15,10 +15,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func CheckError(e error) bool {
+func CheckError(e error) {
 	if e != nil {
 		fmt.Println(e)
-		os.Exit(1)
+		panic(e)
 	}
 }
 
