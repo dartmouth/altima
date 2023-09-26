@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"altima/pkg/util"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -75,7 +76,7 @@ func (o *initOptions) run() {
 		if viper.GetBool("modules." + m + ".enabled") {
 			fmt.Printf("\n# Loading module: %s\n", m)
 			dat, err := os.ReadFile(filepath.Join(settings.ModulesDir, m, "init.sh"))
-			check(err)
+			util.CheckError(err)
 			rendered := string(dat)
 			// Replace all standard variables
 			rendered = strings.ReplaceAll(rendered, "${module_dir}", filepath.Join(settings.ModulesDir, m))

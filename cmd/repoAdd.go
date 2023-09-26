@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"altima/pkg/repo"
+	"altima/pkg/util"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -49,7 +50,7 @@ func init() {
 func (o *repoAddOptions) run() {
 	// Assert that repo name is only alpha-numberic with dashes
 	matched, err := regexp.MatchString("^[^-][a-zA-Z-]+$", o.name)
-	check(err)
+	util.CheckError(err)
 	if !matched {
 		fmt.Println("ERROR: Repo NAME must only contain letters, numbers, and dashes (can't start with dash)")
 		os.Exit(1)
@@ -57,7 +58,7 @@ func (o *repoAddOptions) run() {
 
 	// Download and save repo index
 	err = repo.DownloadIndexFile(o.name, o.url, settings.RepositoryCacheDir)
-	check(err)
+	util.CheckError(err)
 
 	// Write repo to config
 	viper.SetConfigName(settings.ConfigFilename)

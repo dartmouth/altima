@@ -16,6 +16,7 @@ Decrypted string: hello encrypted world!
 */
 
 import (
+	"altima/pkg/util"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
@@ -45,17 +46,11 @@ func GenerateRandomString(length int) string {
 	return string(b)
 }
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
 func CreateKeyFileIfNotExists() {
 	_, err := os.Stat(keyFile)
 	if os.IsNotExist(err) {
 		f, err := os.Create(keyFile)
-		check(err)
+		util.CheckError(err)
 		f.WriteString(GenerateRandomString(32))
 		f.Close()
 	}
@@ -63,7 +58,7 @@ func CreateKeyFileIfNotExists() {
 
 func GetEncryptionKey() string {
 	b, err := os.ReadFile(keyFile)
-	check(err)
+	util.CheckError(err)
 	return string(b)
 }
 
@@ -85,9 +80,7 @@ func Decrypt(text string) string {
 		return ""
 	}
 	cipherText, err := base64.StdEncoding.DecodeString(text)
-	if err != nil {
-		panic(err)
-	}
+	util.CheckError(err)
 	cfb := cipher.NewCFBDecrypter(block, encryptionSalt)
 	plainText := make([]byte, len(cipherText))
 	cfb.XORKeyStream(plainText, cipherText)
@@ -96,7 +89,7 @@ func Decrypt(text string) string {
 
 func GetCredential(name string) {
 	b, err := os.ReadFile(credFile)
-	check(err)
+	util.CheckError(err)
 	fileContent := string(b)
 	lines := strings.Split(fileContent, "\n")
 	for i := 0; i < len(lines); i++ {

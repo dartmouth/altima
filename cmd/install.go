@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"altima/pkg/repo"
+	"altima/pkg/util"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,15 +39,7 @@ var installCmd = &cobra.Command{
 
 			module, err := repo.Search(module, settings.RepositoryCacheDir)
 
-			if err != nil {
-				msg := fmt.Sprintf("Failed to find module %q", module.Name)
-				if module.Version != "" {
-					msg += fmt.Sprintf(" in version %q", module.Version)
-				}
-				msg += " in index!"
-				fmt.Println(fmt.Errorf(msg))
-				continue
-			}
+			util.CheckError(err)
 
 			fmt.Printf("Found URL %q...\n", module.Url)
 

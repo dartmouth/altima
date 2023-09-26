@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"altima/pkg/util"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -45,7 +46,7 @@ func init() {
 func (o *repoRemoveOptions) run() {
 	// Verify input
 	matched, err := regexp.MatchString("^[^-][a-zA-Z-]+$", o.name)
-	check(err)
+	util.CheckError(err)
 	if !matched {
 		fmt.Println("ERROR: Repo NAME must only contain letters, numbers, and dashes (can't start with dash)")
 		os.Exit(1)

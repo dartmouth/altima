@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"altima/pkg/cli"
-	"fmt"
+	"altima/pkg/util"
 	"os"
 	"path/filepath"
 
@@ -39,17 +39,17 @@ func init() {
 	settings = cli.New()
 
 	err := os.MkdirAll(settings.ConfigDir, os.ModePerm)
-	check(err)
+	util.CheckError(err)
 	err = os.MkdirAll(settings.CacheDir, os.ModePerm)
-	check(err)
+	util.CheckError(err)
 	err = os.MkdirAll(settings.ModulesDir, os.ModePerm)
-	check(err)
+	util.CheckError(err)
 	err = os.MkdirAll(settings.RepositoryCacheDir, os.ModePerm)
-	check(err)
+	util.CheckError(err)
 
 	if _, err := os.Stat(filepath.Join(settings.ConfigDir, settings.ConfigFilename)); os.IsNotExist(err) {
 		_, err := os.Create(filepath.Join(settings.ConfigDir, settings.ConfigFilename))
-		check(err)
+		util.CheckError(err)
 	}
 
 	// Here you will define your flags and configuration settings.
@@ -61,11 +61,4 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func check(e error) {
-	if e != nil {
-		fmt.Println(e)
-		os.Exit(1)
-	}
 }
