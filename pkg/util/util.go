@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +14,13 @@ import (
 
 	"github.com/pkg/errors"
 )
+
+func CheckError(e error) bool {
+	if e != nil {
+		fmt.Println(e)
+		os.Exit(1)
+	}
+}
 
 func DeduceType(v string) any {
 	// The TOML syntax with respect to types is identical to JSON
