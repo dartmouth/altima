@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 
 	"github.com/pelletier/go-toml/v2"
 	"github.com/spf13/cobra"
@@ -21,7 +20,7 @@ var installCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
-		modules := getModules(args)
+		modules := repo.GetModulesFromString(args)
 
 		viper.SetConfigName(settings.ConfigFilename)
 		viper.SetConfigType("toml")
@@ -102,54 +101,4 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// installCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func getModules(args []string) []repo.Module {
-	// Module names, versions and aliases are supplied on the command line like this:
-	// moduleA moduleB==v0.0.2 moduleC>myAlias moduleD==v0.0.3>myOtherAlias
-	// This function turns the slice of arguments into a slice of Module objects.
-
-	modules := make([]repo.Module, 0)
-	for _, arg := range args {
-		modules = append(modules, repo.Module{
-			Name:    getName(arg),
-			Version: getVersion(arg),
-			Alias:   getAlias(arg),
-		})
-	}
-
-	return modules
-}
-
-func getName(s string) string {
-	// The name of the module comes before the version or the alias
-	pattern := regexp.MustCompile("^(.*?)(?:==|>|$)")
-	match := pattern.FindStringSubmatch(s)
-	if match == nil {
-		return ""
-	}
-
-	return match[1]
-}
-
-func getVersion(s string) string {
-	// The version always follows `==` and may precede `>`
-	pattern := regexp.MustCompile("==(.*?)(?:>|$)")
-	match := pattern.FindStringSubmatch(s)
-	if match == nil {
-		return ""
-	}
-
-	return match[1]
-}
-
-func getAlias(s string) string {
-	// The alias always follows `>`
-	pattern := regexp.MustCompile(">(.*)")
-	match := pattern.FindStringSubmatch(s)
-	if match == nil {
-		return ""
-	}
-
-	return match[1]
 }

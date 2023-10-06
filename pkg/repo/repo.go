@@ -117,3 +117,20 @@ func UninstallModule(module Module, rootDir string) error {
 
 	return err
 }
+
+func GetModulesFromString(args []string) []Module {
+	// Module names, versions and aliases are supplied on the command line like this:
+	// moduleA moduleB==v0.0.2 moduleC>myAlias moduleD==v0.0.3>myOtherAlias
+	// This function turns the slice of arguments into a slice of Module objects.
+
+	modules := make([]Module, 0)
+	for _, arg := range args {
+		modules = append(modules, Module{
+			Name:    util.GetName(arg),
+			Version: util.GetVersion(arg),
+			Alias:   util.GetAlias(arg),
+		})
+	}
+
+	return modules
+}
