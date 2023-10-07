@@ -45,7 +45,7 @@ func init() {
 
 func (o *repoRemoveOptions) run() {
 	// Verify input
-	matched, err := regexp.MatchString("^[^-][a-zA-Z-]+$", o.name)
+	matched, err := regexp.MatchString("^[^-][a-zA-Z0-9-]+$", o.name)
 	util.CheckError(err)
 	if !matched {
 		fmt.Println("ERROR: Repo NAME must only contain letters, numbers, and dashes (can't start with dash)")
