@@ -106,46 +106,31 @@ func InstallModule(module Module, rootDir string) error {
 	return nil
 }
 
-// DownloadIndexFile fetches the index from a repository.
-// func (r *ChartRepository) DownloadIndexFile() error {
+func UninstallModule(module Module, rootDir string) error {
+	installName := module.Name
+	if module.Alias != "" {
+		installName = module.Alias
+	}
 
-// indexURL, err := ResolveReferenceURL(r.Config.URL, "index.yaml")
-// if err != nil {
-// 	return "", err
-// }
+	moduleRootFolder := filepath.Join(rootDir, installName)
+	err := os.RemoveAll(moduleRootFolder)
 
-// resp, err := r.Client.Get(indexURL,
-// 	getter.WithURL(r.Config.URL),
-// 	getter.WithInsecureSkipVerifyTLS(r.Config.InsecureSkipTLSverify),
-// 	getter.WithTLSClientConfig(r.Config.CertFile, r.Config.KeyFile, r.Config.CAFile),
-// 	getter.WithBasicAuth(r.Config.Username, r.Config.Password),
-// 	getter.WithPassCredentialsAll(r.Config.PassCredentialsAll),
-// )
-// if err != nil {
-// 	return "", err
-// }
+	return err
+}
 
-// index, err := io.ReadAll(resp)
-// if err != nil {
-// 	return "", err
-// }
+func GetModulesFromString(args []string) []Module {
+	// Module names, versions and aliases are supplied on the command line like this:
+	// moduleA moduleB==v0.0.2 moduleC>myAlias moduleD==v0.0.3>myOtherAlias
+	// This function turns the slice of arguments into a slice of Module objects.
 
-// indexFile, err := loadIndex(index, r.Config.URL)
-// if err != nil {
-// 	return "", err
-// }
+	modules := make([]Module, 0)
+	for _, arg := range args {
+		modules = append(modules, Module{
+			Name:    util.GetName(arg),
+			Version: util.GetVersion(arg),
+			Alias:   util.GetAlias(arg),
+		})
+	}
 
-// // Create the chart list file in the cache directory
-// var charts strings.Builder
-// for name := range indexFile.Entries {
-// 	fmt.Fprintln(&charts, name)
-// }
-// chartsFile := filepath.Join(r.CachePath, helmpath.CacheChartsFile(r.Config.Name))
-// os.MkdirAll(filepath.Dir(chartsFile), 0755)
-// os.WriteFile(chartsFile, []byte(charts.String()), 0644)
-
-// // Create the index file in the cache directory
-// fname := filepath.Join(r.CachePath, helmpath.CacheIndexFile(r.Config.Name))
-// os.MkdirAll(filepath.Dir(fname), 0755)
-// return fname, os.WriteFile(fname, index, 0644)
-// }
+	return modules
+}

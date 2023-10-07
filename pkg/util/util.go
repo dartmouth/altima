@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 
 	"github.com/pkg/errors"
 )
@@ -136,4 +137,38 @@ func UnpackFile(filename string, targetRoot string) error {
 
 func DeleteFile(filename string) error {
 	return os.Remove(filename)
+}
+
+
+func GetName(s string) string {
+	// The name of the module comes before the version or the alias
+	pattern := regexp.MustCompile("^(.*?)(?:==|>|$)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
+}
+
+func GetVersion(s string) string {
+	// The version always follows `==` and may precede `>`
+	pattern := regexp.MustCompile("==(.*?)(?:>|$)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
+}
+
+func GetAlias(s string) string {
+	// The alias always follows `>`
+	pattern := regexp.MustCompile(">(.*)")
+	match := pattern.FindStringSubmatch(s)
+	if match == nil {
+		return ""
+	}
+
+	return match[1]
 }
